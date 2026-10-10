@@ -8,8 +8,6 @@ Config = Config or {}
 
 Config.NativeHorrorAudio = {
     enabled = false,
-    debug = Config.Debug == true,
-
     -- When prompt_sandy_halloween is running, literal sounds (footsteps, whispers, chains, creak,
     -- distant scream, coffin/dock knocks) play in 3D through its sound bank - from the Bellman
     -- figure itself, from the coffin / the dock, or from behind the player. Stingers stay in the NUI.

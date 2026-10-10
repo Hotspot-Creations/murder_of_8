@@ -4,7 +4,6 @@
 
 local vossPed = nil
 local vossCuffs = nil
-local forceVoss = false
 local novaFound = false
 
 -- Voss reveal / HELP sequence
@@ -99,7 +98,7 @@ local function getPanToWorldPoint(target)
 
     local yaw = math.rad(GetGameplayCamRot(2).z)
     local forwardX = -math.sin(yaw)
-    local forwardY = math.cos(yaw)
+    local forwardY =  math.cos(yaw)
     local rightX = forwardY
     local rightY = -forwardX
 
@@ -143,13 +142,6 @@ local function playVossHelp()
         nativeBypass = true
     })
 
-    if Config.Debug then
-        print(
-            ('^5[Murder of 8 Voss]^0 HELP | distance %.1fm | volume %.2f | pan %.2f')
-            :format(distance, volume, pan)
-        )
-    end
-
     return true
 end
 
@@ -192,13 +184,6 @@ local function startVossHelp()
 
             if distance <= HELP_STOP_DISTANCE then
                 vossReached = true
-
-                if Config.Debug then
-                    print(
-                        ('^2[Murder of 8 Voss]^0 Player reached Voss at %.2fm - HELP stopped.')
-                        :format(distance)
-                    )
-                end
 
                 TriggerEvent('m8:client:vossReached', vossPed, currentChair)
                 break
@@ -282,10 +267,6 @@ local function addVossCuffs(ped)
     )
 
     SetModelAsNoLongerNeeded(hash)
-
-    if Config.Debug then
-        print('^2[Murder of 8 Chair 8]^0 Visible cuffs attached to Voss.')
-    end
 end
 
 local function removeVoss()
@@ -344,16 +325,13 @@ local function spawnVoss(ignoreGate)
         return vossPed
     end
 
-    if not ignoreGate and not forceVoss and not novaFound then
+    if not ignoreGate and not novaFound then
         return nil
     end
 
     local chair = getChair8()
 
     if not chair then
-        if Config.Debug then
-            print('^3[Murder of 8 Chair 8]^0 chair_8 is not currently spawned.')
-        end
         return nil
     end
 
@@ -444,12 +422,12 @@ local function spawnVoss(ignoreGate)
 
     print(
         ('^2[Murder of 8 Chair 8]^0 Voss spawned on chair_8 | offset %.3f %.3f %.3f | headingOffset %.2f')
-        :format(
-            offset.x,
-            offset.y,
-            offset.z,
-            vossCfg.headingOffset or 0.0
-        )
+            :format(
+                offset.x,
+                offset.y,
+                offset.z,
+                vossCfg.headingOffset or 0.0
+            )
     )
 
     return vossPed
@@ -458,11 +436,7 @@ end
 RegisterNetEvent('m8:client:progress', function(progress)
     refreshNovaState(progress)
 
-    -- Story/progress changes cancel any temporary debug Voss override.
     if not novaFound then
-        forceVoss = false
-        vossReached = false
-        stopVossHelp()
         removeVoss()
     end
 end)
@@ -493,15 +467,15 @@ CreateThread(function()
         local chair = getChair8()
 
         if chair then
-            if (novaFound or forceVoss)
+            if novaFound
                 and not (vossPed and DoesEntityExist(vossPed))
             then
                 local ped = spawnVoss(false)
 
-                if ped and novaFound and not forceVoss and not vossReached then
+                if ped and novaFound and not vossReached then
                     startVossHelp()
                 end
-            elseif novaFound and not forceVoss and not vossReached and not helpLoopRunning then
+            elseif novaFound and not vossReached and not helpLoopRunning then
                 startVossHelp()
             end
         elseif vossPed then
@@ -512,152 +486,8 @@ CreateThread(function()
     end
 end)
 
-RegisterCommand('m8voss', function()
-    if not Config.Debug then return end
-
-    forceVoss = false
-    vossReached = false
-    removeVoss()
-    Wait(100)
-
-    if not spawnVoss(true) then
-        TriggerEvent(
-            'm8:client:notify',
-            'chair_8 is not spawned. Be nearby at night with Chapter 8 unlocked.'
-        )
-    else
-        TriggerEvent('m8:client:notify', 'Voss forced onto chair_8.')
-    end
-end, false)
-
-RegisterCommand('m8vossremove', function()
-    if not Config.Debug then return end
-
-    forceVoss = false
-    removeVoss()
-
-    TriggerEvent('m8:client:notify', 'Voss removed.')
-end, false)
-
-RegisterCommand('m8vossoffset', function(_, args)
-    if not Config.Debug then return end
-
-    local x = tonumber(args[1])
-    local y = tonumber(args[2])
-    local z = tonumber(args[3])
-    local h = tonumber(args[4])
-
-    if not x or not y or not z then
-        print(
-            '^1[Murder of 8 Chair 8]^0 Usage: /m8vossoffset <x> <y> <z> [headingOffset]'
-        )
-        return
-    end
-
-    local vossCfg = config().voss
-
-    vossCfg.offset = vector3(x, y, z)
-
-    if h then
-        vossCfg.headingOffset = h
-    end
-
-    forceVoss = true
-    removeVoss()
-    Wait(100)
-    spawnVoss(true)
-
-    print(
-        ('^5[Murder of 8 Chair 8]^0 offset = vector3(%.3f, %.3f, %.3f), headingOffset = %.2f')
-        :format(
-            x,
-            y,
-            z,
-            vossCfg.headingOffset or 0.0
-        )
-    )
-end, false)
-
-RegisterCommand('m8chair8status', function()
-    if not Config.Debug then return end
-
-    local chair = getChair8()
-    local vossCfg = config().voss or {}
-    local offset = vossCfg.offset or vector3(0.0, 0.0, 0.0)
-
-    local msg =
-        ('chair_8=%s | Voss=%s | cuffs=%s | Nova=%s | force=%s | offset %.2f %.2f %.2f')
-        :format(
-            tostring(chair ~= nil),
-            tostring(vossPed and DoesEntityExist(vossPed) or false),
-            tostring(vossCuffs and DoesEntityExist(vossCuffs) or false),
-            tostring(novaFound),
-            tostring(forceVoss),
-            offset.x,
-            offset.y,
-            offset.z
-        )
-
-    print('^5[Murder of 8 Chair 8]^0 ' .. msg)
-    TriggerEvent('m8:client:notify', msg)
-end, false)
-
-RegisterCommand('m8vosscuffedanim', function()
-    if not Config.Debug then return end
-    if not vossPed or not DoesEntityExist(vossPed) then return end
-
-    FreezeEntityPosition(vossPed, false)
-    applyRestrainedPose(vossPed)
-    Wait(300)
-    FreezeEntityPosition(vossPed, true)
-end, false)
-
-
--- Force/test the HELP reveal without replaying Chapter 8.
-RegisterCommand('m8vosshelp', function()
-    if not Config.Debug then return end
-
-    if not vossPed or not DoesEntityExist(vossPed) then
-        vossReached = false
-        removeVoss()
-        Wait(100)
-
-        if not spawnVoss(true) then
-            TriggerEvent(
-                'm8:client:notify',
-                'Could not spawn Voss. Make sure chair_8 is currently spawned.'
-            )
-            return
-        end
-    end
-
-    vossReached = false
-    stopVossHelp()
-    Wait(50)
-    startVossHelp()
-
-    TriggerEvent(
-        'm8:client:notify',
-        'Voss HELP sequence started. Walk away, then approach Chair 8.'
-    )
-end, false)
-
-RegisterCommand('m8vosshelpstop', function()
-    if not Config.Debug then return end
-
-    stopVossHelp()
-
-    TriggerEvent(
-        'm8:client:notify',
-        'Voss HELP sequence stopped.'
-    )
-end, false)
-
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
     removeVoss()
 end)
 
-print(
-    '^2[Murder of 8 Chair 8]^0 Loaded. Using evidence instance chair_8.'
-)

@@ -41,7 +41,7 @@ local function findClosestObject(modelName, targetCoords, radius)
 end
 
 local function fixProp(data)
-    local object, distance = findClosestObject(
+    local object = findClosestObject(
         data.model,
         data.coords,
         data.radius
@@ -55,33 +55,10 @@ local function fixProp(data)
     if fixedEntities[object] then
         return
     end
-
-    local before = GetEntityCoords(object)
-
     PlaceObjectOnGroundProperly(object)
-
-    local after = GetEntityCoords(object)
-
     FreezeEntityPosition(object, true)
 
     fixedEntities[object] = true
-
-    if Config.Debug then
-        print(
-            ("^2[Murder of 8]^0 Grounded %s | %.2fm away")
-            :format(data.model, distance)
-        )
-
-        print(
-            ("Before: %.4f, %.4f, %.4f")
-            :format(before.x, before.y, before.z)
-        )
-
-        print(
-            ("After: %.4f, %.4f, %.4f")
-            :format(after.x, after.y, after.z)
-        )
-    end
 end
 
 CreateThread(function()

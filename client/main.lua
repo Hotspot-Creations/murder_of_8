@@ -431,9 +431,6 @@ CreateThread(function()
                 lastSceneStates[sceneId] = active
                 TriggerEvent(('m8:%s:active'):format(sceneId), active)
                 TriggerEvent('m8:scene:active', sceneId, active)
-                if Config.Debug then
-                    print(('[Murder of 8] Scene %s active: %s'):format(sceneId, tostring(active)))
-                        end
                  Wait(1000)
             end
         end
@@ -449,74 +446,8 @@ CreateThread(function()
     end
 end)
 
-RegisterCommand('m8uitest', function() openCasebook(nil) end, false)
-
-RegisterCommand('m8coords', function()
-    if not Config.Debug then return end
-    local ped = PlayerPedId()
-    local c = GetEntityCoords(ped)
-    local h = GetEntityHeading(ped)
-    local msg = ('vector3(%.3f, %.3f, %.3f) | vector4(%.3f, %.3f, %.3f, %.3f)')
-        :format(c.x, c.y, c.z, c.x, c.y, c.z, h)
-    print('[Murder of 8] ' .. msg)
-    notify(msg)
-end, false)
-
-RegisterCommand('m8reset', function()
-    if Config.Debug then TriggerServerEvent('m8:server:debugReset') end
-end, false)
-
-RegisterCommand('m8chapter', function(_, args)
-    if not Config.Debug then return end
-    local chapter = tonumber(args[1])
-    if not chapter then notify('Usage: /m8chapter 1-8') return end
-    TriggerServerEvent('m8:server:debugChapter', chapter)
-end, false)
-
-RegisterCommand('m8evidence', function(_, args)
-    if not Config.Debug then return end
-    if not args[1] then notify('Usage: /m8evidence evidence_id') return end
-    TriggerServerEvent('m8:server:debugEvidence', args[1])
-end, false)
-
-RegisterCommand('m8complete', function(_, args)
-    if not Config.Debug then return end
-    local chapter = tonumber(args[1])
-    if not chapter then notify('Usage: /m8complete 1-8') return end
-    TriggerServerEvent('m8:server:debugCompleteChapter', chapter)
-end, false)
-
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
     removeSilhouette()
     if casebookOpen then SetNuiFocus(false, false) end
 end)
-
-RegisterCommand('m8gatestatus', function()
-    local progress = M8_GetProgress()
-    local active = M8_IsActivelyInvestigating()
-    local sandy = M8_IsInSandy()
-    local nearScene = M8_IsNearActiveScene()
-    local huntTime = M8_IsHuntTime()
-
-    print('^3[Murder of 8 Gate Status]^0')
-    print('Hunt time:', huntTime)
-    print('In Sandy:', sandy)
-    print('Near active clue:', nearScene)
-    print('Actively investigating:', active)
-    print('Current chapter:', progress and progress.chapter or 'unknown')
-    print('Time:', ('%02d:%02d'):format(GetClockHours(), GetClockMinutes()))
-
-    TriggerEvent(
-        'm8:client:notify',
-        ('Hunt:%s | Sandy:%s | Clue:%s | Active:%s | %02d:%02d')
-            :format(
-                tostring(huntTime),
-                tostring(sandy),
-                tostring(nearScene),
-                tostring(active),
-                GetClockHours(),
-                GetClockMinutes()
-            )
-    )
-end, false)

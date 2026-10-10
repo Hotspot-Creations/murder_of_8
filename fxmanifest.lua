@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Hotspot Creations & Prompt Studios'
 description 'Murder of 8 - standalone Halloween investigation resource for sandy shores halloween event!'
-version '1.6.6'
+version '1.7.0'
 
 ui_page 'html/index.html'
 

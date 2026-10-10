@@ -9,8 +9,6 @@ Config.ScriptedScares = Config.ScriptedScares or {}
 local S = Config.ScriptedScares
 
 S.enabled = S.enabled ~= false
-S.debug = Config.Debug == true
-
 -- Local-only figure used for Bellman appearances. This falls back to the
 -- existing Scare Director model so you only need to change one model later.
 S.figureModel = S.figureModel

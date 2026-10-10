@@ -26,12 +26,6 @@ local function cfg()
     return Config.NativeHorrorAudio
 end
 
-local function debugPrint(msg)
-    if cfg().debug then
-        print(('^5[Murder of 8 Native Audio]^0 %s'):format(msg))
-    end
-end
-
 local function releaseSound(id)
     if not id or id == -1 then return end
 
@@ -178,8 +172,6 @@ local function ensureGhostBank()
         cfg().ghostBank or 'DLC_MP2023_1/DLC_MP2023_1_GH',
         false
     ) == true
-
-    debugPrint(('Ghost audio bank available: %s'):format(tostring(ghostBankAvailable)))
     return ghostBankAvailable
 end
 
@@ -234,7 +226,6 @@ local function invisibleFootsteps(running, pan)
         local hash = loadModel(model)
 
         if not hash then
-            debugPrint('Could not load footstep ped model.')
             return
         end
 
@@ -476,58 +467,6 @@ RegisterNUICallback('nativeSound', function(data, cb)
 
     cb({ ok = ok == true })
 end)
-
-RegisterCommand('m8native', function(_, args)
-    if not Config.Debug then return end
-
-    local name = string.lower(args[1] or '')
-
-    if name == 'scream' then
-        name = 'distant_scream'
-    end
-
-    local valid = {
-        bell = true,
-        archive_bell = true,
-        whisper = true,
-        distant_scream = true,
-        breath = true,
-        footsteps = true,
-        footsteps_run = true,
-        coffin_knocks = true,
-        dock_knocks = true,
-        metal_clang = true,
-        impact = true,
-        body_drop = true,
-        chain_drag = true,
-        door_creak = true,
-        phone_ring = true,
-        train_horn = true,
-        jump_sting = true,
-        slasher_spawn = true,
-        slasher_despawn = true,
-        slasher_loop = true,
-        reverse_sting = true
-    }
-
-    if not valid[name] then
-        TriggerEvent(
-            'm8:client:notify',
-            'Usage: /m8native bell | whisper | scream | breath | footsteps | footsteps_run | coffin_knocks | dock_knocks | metal_clang | body_drop | chain_drag | door_creak | phone_ring | train_horn | jump_sting | slasher_spawn'
-        )
-        return
-    end
-
-
-    local ok = M8NativeAudio.Play(name, {
-        pan = (math.random(0, 1) == 0 and -0.85 or 0.85)
-    })
-
-    TriggerEvent(
-        'm8:client:notify',
-        ('Native audio %s: %s'):format(name, ok and 'triggered' or 'not mapped / fallback')
-    )
-end, false)
 
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end

@@ -18,12 +18,6 @@ local function cfg()
     return Config.ScriptedScares
 end
 
-local function debugPrint(message)
-    if cfg().debug then
-        print(('^5[Murder of 8 Scripted]^0 %s'):format(message))
-    end
-end
-
 -- entity: the figure the sound belongs to; at: a world position (the cell, the coffin). A positional
 -- layer (Sandy Halloween bank from the figure itself, or GTA native audio) takes literal sounds
 -- first; otherwise the NUI OGG plays. Sound designer can replace the OGG assets without touching this.
@@ -253,7 +247,6 @@ local function beginSequence(name, force)
     active = true
     sequenceToken = sequenceToken + 1
     local token = sequenceToken
-    debugPrint(('Starting %s'):format(name))
     return token
 end
 
@@ -264,7 +257,6 @@ end
 local function finishSequence(token)
     if token ~= sequenceToken then return end
     active = false
-    debugPrint('Sequence finished')
 end
 
 local function waitForCasebookClose(token)
@@ -733,7 +725,6 @@ local function runSequence(sequenceName, force)
             turnHit(token, 'DON\'T LOOK BEHIND HIM.')
 
         else
-            debugPrint(('Unknown sequence: %s'):format(tostring(sequenceName)))
         end
 
         cleanupFigure()
@@ -782,172 +773,12 @@ AddEventHandler('m8:client:evidenceFound', function(evidenceId)
 end)
 
 RegisterNetEvent('m8:client:progress', function(progress)
-    -- A debug reset/fresh run should allow authored scares to fire again.
+    -- Fresh progress should allow authored scares to fire again.
     if not progress or not progress.evidence or next(progress.evidence) == nil then
         firedEvidence = {}
         M8ScriptedScares.Stop()
     end
 end)
-
--- Debug -------------------------------------------------------------------
--- These commands are registered as soon as this file loads.
--- Mechanic tests are intentionally IMMEDIATE; they do not wait for evidence,
--- chapter state, movement, or the current in-game time.
-
-local mechanicNames = {
-    face = true,
-    pass = true,
-    turn = true,
-    blink = true,
-    rush = true,
-    body = true,
-    ['false'] = true,
-    watcher = true,
-    peripheral = true,
-    blackout = true
-}
-
-local locationToMechanic = {
-    house = 'face',
-    church = 'turn',
-    motel = 'pass',
-    hospital = 'blink',
-    station = 'rush',
-    marina = 'body',
-    university = 'blackout',
-    compound = 'false'
-}
-
-local function runImmediateMechanic(name)
-    -- Stop any old test so a stuck sequence can never block the next command.
-    M8ScriptedScares.Stop()
-
-    local token = beginSequence('debug_' .. tostring(name), true)
-    if not token then
-        TriggerEvent('m8:client:notify', 'Could not start jumpscare: ' .. tostring(name))
-        return false
-    end
-
-    CreateThread(function()
-        cleanupAll()
-
-        -- Brief frame so a command never feels like it was ignored.
-        Wait(100)
-
-        if name == 'face' then
-            faceHit()
-
-        elseif name == 'pass' then
-            passAcrossView(token, true)
-
-        elseif name == 'turn' then
-            message('TURN AROUND.', 900)
-            turnHit(token, nil)
-
-        elseif name == 'blink' then
-            blinkApproach(token)
-
-        elseif name == 'rush' then
-            rushAtPlayer(token, 10.0)
-
-        elseif name == 'body' then
-            bodyDropCombo(token)
-
-        elseif name == 'false' then
-            falseExit(token)
-
-        elseif name == 'watcher' then
-            aisleWatcher(token, 7.0)
-
-        elseif name == 'peripheral' then
-            peripheralPeek(token)
-
-        elseif name == 'blackout' then
-            blackoutBehind(token)
-
-        else
-            TriggerEvent('m8:client:notify', 'Unknown jumpscare mechanic: ' .. tostring(name))
-        end
-
-        cleanupFigure()
-        finishSequence(token)
-    end)
-
-    return true
-end
-
-local function showJumpHelp()
-    TriggerEvent(
-        'm8:client:notify',
-        '/m8jump face|pass|turn|blink|rush|body|false|watcher|peripheral|blackout|random|house|church|motel|hospital|station|marina|university|compound|stop'
-    )
-end
-
-RegisterCommand('m8jump', function(_, args)
-    if not Config.Debug then
-        TriggerEvent('m8:client:notify', 'Config.Debug must be true to use /m8jump.')
-        return
-    end
-
-    local requested = string.lower(args[1] or '')
-
-    if requested == '' or requested == 'help' then
-        showJumpHelp()
-        return
-    end
-
-    if requested == 'stop' then
-        M8ScriptedScares.Stop()
-        TriggerEvent('m8:client:notify', 'Jumpscare stopped.')
-        return
-    end
-
-    if requested == 'random' then
-        local options = {
-            'face', 'pass', 'turn', 'blink', 'rush',
-            'body', 'false', 'watcher', 'peripheral', 'blackout'
-        }
-        requested = options[math.random(1, #options)]
-    end
-
-    if locationToMechanic[requested] then
-        local location = requested
-        requested = locationToMechanic[requested]
-        TriggerEvent(
-            'm8:client:notify',
-            ('Chapter test %s -> %s'):format(location, requested)
-        )
-    elseif not mechanicNames[requested] then
-        showJumpHelp()
-        return
-    end
-
-    local started = runImmediateMechanic(requested)
-
-    if started then
-        TriggerEvent('m8:client:notify', 'Jumpscare started: ' .. requested)
-    end
-end, false)
-
--- Short alias so F8 testing is faster.
-RegisterCommand('m8j', function(_, args)
-    ExecuteCommand('m8jump ' .. table.concat(args or {}, ' '))
-end, false)
-
--- Smoke-test command. This proves the file is loaded even before testing a scare.
-RegisterCommand('m8jumptest', function()
-    TriggerEvent('m8:client:notify', 'scripted_scares.lua IS LOADED. /m8jump is registered.')
-    print('^2[Murder of 8 Scripted]^0 /m8jumptest confirmed command registration.')
-end, false)
-
-RegisterCommand('m8jumpreset', function()
-    firedEvidence = {}
-    M8ScriptedScares.Stop()
-    TriggerEvent('m8:client:notify', 'Scripted jumpscare state reset.')
-end, false)
-
-print('^2[Murder of 8 Scripted]^0 v1.6.2 loaded. Commands: /m8jump, /m8j, /m8jumptest')
-
 
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end

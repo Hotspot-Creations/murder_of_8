@@ -27,15 +27,15 @@ local Finale = {
     },
 
     -- Wall message prop. These are local offsets from the bed position.
-    -- Use /m8finalwall and /m8finalwalloffset to tune it live.
+    -- Final wall-message placement.
     wallText = {
-        model = 'darkvanar_halloween_text_02',
+        model = 'darkvanar_halloween_uni_text',
         side = 0.00,
-        forward = 3.80,
+        forward = 2.15,
         height = 1.30,
         rotX = 0.0,
         rotY = 0.0,
-        headingOffset = 167.65
+        headingOffset = 180.0
     },
 
     -- Turn detection. The body will not drop just because the camera moved a
@@ -249,20 +249,6 @@ local function spawnWallText()
 
     SetModelAsNoLongerNeeded(hash)
 
-    if Config.Debug then
-        print(
-            ('^2[Murder of 8 Finale]^0 Wall text spawned at vector3(%.4f, %.4f, %.4f) | rot %.2f %.2f %.2f')
-                :format(
-                    coords.x,
-                    coords.y,
-                    coords.z,
-                    cfg.rotX or 0.0,
-                    cfg.rotY or 0.0,
-                    Finale.bed.w + (cfg.headingOffset or 180.0)
-                )
-        )
-    end
-
     return true
 end
 
@@ -349,28 +335,8 @@ local function hideFinalRoomDecor()
                 SetEntityVisible(object, false, false)
                 SetEntityAlpha(object, 0, false)
                 SetEntityCollision(object, false, false)
-
-                if Config.Debug then
-                    print(
-                        ('^3[Murder of 8 Finale]^0 Hidden decor hash=%s at vector3(%.4f, %.4f, %.4f) dist=%.2f')
-                            :format(
-                                tostring(model),
-                                coords.x,
-                                coords.y,
-                                coords.z,
-                                distance
-                            )
-                    )
-                end
             end
         end
-    end
-
-    if Config.Debug then
-        print(
-            ('^3[Murder of 8 Finale]^0 Cleanup center vector3(%.4f, %.4f, %.4f), radius %.2f, hidden=%d')
-                :format(center.x, center.y, center.z, radius, #hiddenDecor)
-        )
     end
 end
 
@@ -550,19 +516,6 @@ local function spawnAndDropBody()
 
     SetModelAsNoLongerNeeded(hash)
 
-    if Config.Debug then
-        print(
-            ('^2[Murder of 8 Finale]^0 Dropped final corpse using %s at vector4(%.4f, %.4f, %.4f, %.4f)')
-                :format(
-                    modelName,
-                    endCoords.x,
-                    endCoords.y,
-                    endCoords.z,
-                    endCoords.w
-                )
-        )
-    end
-
     return true
 end
 
@@ -717,137 +670,6 @@ RegisterNetEvent('m8:client:progress', function(progress)
     end
 end)
 
--- DEBUG ----------------------------------------------------------------------
-
--- Spawn only the final wall text so it can be positioned without replaying
--- the entire cinematic.
-RegisterCommand('m8finalwall', function()
-    if not Config.Debug then return end
-
-    spawnWallText()
-
-    TriggerEvent(
-        'm8:client:notify',
-        'Final wall text spawned. Use /m8finalwalloffset to tune it.'
-    )
-end, false)
-
--- /m8finalwalloffset <side> <forward> <height> [rotX] [rotY] [headingOffset]
---
--- Example:
--- /m8finalwalloffset 0.00 2.15 1.30 0 0 180
-RegisterCommand('m8finalwalloffset', function(_, args)
-    if not Config.Debug then return end
-
-    local side = tonumber(args[1])
-    local forward = tonumber(args[2])
-    local height = tonumber(args[3])
-
-    if not side or not forward or not height then
-        print(
-            '^1[Murder of 8 Finale]^0 Usage: /m8finalwalloffset <side> <forward> <height> [rotX] [rotY] [headingOffset]'
-        )
-        return
-    end
-
-    local cfg = Finale.wallText
-
-    cfg.side = side
-    cfg.forward = forward
-    cfg.height = height
-    cfg.rotX = tonumber(args[4]) or cfg.rotX or 0.0
-    cfg.rotY = tonumber(args[5]) or cfg.rotY or 0.0
-    cfg.headingOffset = tonumber(args[6]) or cfg.headingOffset or 180.0
-
-    spawnWallText()
-
-    local coords = getWallTextCoords()
-
-    print('^5[Murder of 8 Finale]^0 Copy these wallText values into finale.lua:')
-    print(
-        ('side = %.3f, forward = %.3f, height = %.3f, rotX = %.2f, rotY = %.2f, headingOffset = %.2f')
-            :format(
-                cfg.side,
-                cfg.forward,
-                cfg.height,
-                cfg.rotX,
-                cfg.rotY,
-                cfg.headingOffset
-            )
-    )
-
-    print(
-        ('^5[Murder of 8 Finale]^0 Current world coords: vector3(%.4f, %.4f, %.4f)')
-            :format(coords.x, coords.y, coords.z)
-    )
-end, false)
-
-RegisterCommand('m8finalwallremove', function()
-    if not Config.Debug then return end
-    deleteWallText()
-end, false)
-
-RegisterCommand('m8finaltest', function()
-    if not Config.Debug then return end
-
-    resetFinale()
-    Wait(100)
-    beginFinalBellSequence()
-end, false)
-
-RegisterCommand('m8finaldrop', function()
-    if not Config.Debug then return end
-
-    deleteBody()
-
-    sequenceRunning = true
-    spawnAndDropBody()
-    sequenceRunning = false
-end, false)
-
-RegisterCommand('m8finalcleanup', function()
-    if not Config.Debug then return end
-
-    hideFinalRoomDecor()
-
-    TriggerEvent(
-        'm8:client:notify',
-        ('Final room cleanup hid %d nearby prop(s). Check F8 for hashes/coords.')
-            :format(#hiddenDecor)
-    )
-end, false)
-
-RegisterCommand('m8finalrestore', function()
-    if not Config.Debug then return end
-
-    resetFinale()
-
-    TriggerEvent(
-        'm8:client:notify',
-        'Finale body/decor restored/cleared.'
-    )
-end, false)
-
-RegisterCommand('m8finalcoords', function()
-    if not Config.Debug then return end
-
-    local ped = PlayerPedId()
-    local coords = GetEntityCoords(ped)
-    local heading = GetEntityHeading(ped)
-
-    print(
-        ('^5[Murder of 8 Finale]^0 Player vector4(%.4f, %.4f, %.4f, %.4f)')
-            :format(coords.x, coords.y, coords.z, heading)
-    )
-
-    local center = getCleanupCenter()
-
-    print(
-        ('^5[Murder of 8 Finale]^0 Cleanup center vector3(%.4f, %.4f, %.4f)')
-            :format(center.x, center.y, center.z)
-    )
-end, false)
-
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then
         return
@@ -856,4 +678,3 @@ AddEventHandler('onResourceStop', function(resourceName)
     resetFinale()
 end)
 
-print('^2[Murder of 8 Finale]^0 Final wake/wall-turn/body-drop/credits sequence loaded.')

@@ -48,12 +48,6 @@ local function loadModel(modelName)
     local hash = joaat(modelName)
 
     if not IsModelInCdimage(hash) or not IsModelValid(hash) then
-        if Config.Debug then
-            print(
-                ('^1[Murder of 8 Props]^0 Invalid model for %s: %s')
-                :format(tostring(modelName), tostring(modelName))
-            )
-        end
         return nil
     end
 
@@ -66,12 +60,6 @@ local function loadModel(modelName)
     end
 
     if not HasModelLoaded(hash) then
-        if Config.Debug then
-            print(
-                ('^1[Murder of 8 Props]^0 Timed out loading model: %s')
-                :format(tostring(modelName))
-            )
-        end
         return nil
     end
 
@@ -173,19 +161,6 @@ local function spawnProp(prop)
         -- IMPORTANT:
         -- Store by instance instead of evidence ID.
         spawned[spawnKey] = object
-
-        if Config.Debug then
-            print(
-                ('^2[Murder of 8 Props]^0 Spawned %s [%s] at %.2f, %.2f, %.2f')
-                :format(
-                    prop.id,
-                    spawnKey,
-                    coords.x,
-                    coords.y,
-                    coords.z
-                )
-            )
-        end
     end
 
     SetModelAsNoLongerNeeded(hash)
@@ -214,10 +189,6 @@ CreateThread(function()
         if not night then
             if next(spawned) ~= nil then
                 deleteAllProps()
-
-                if Config.Debug and wasHuntTime == true then
-                    print('^3[Murder of 8 Props]^0 Daylight reached - all evidence props removed.')
-                end
             end
 
             wasHuntTime = false
@@ -257,10 +228,6 @@ CreateThread(function()
                 end
             end
 
-            if Config.Debug and wasHuntTime == false then
-                print('^2[Murder of 8 Props]^0 Hunt hours started - evidence props enabled.')
-            end
-
             wasHuntTime = true
             Wait(750)
         end
@@ -278,67 +245,8 @@ function M8_GetSpawnedEvidenceProp(key)
     return nil
 end
 
--- DEBUG -----------------------------------------------------------------------
-
-RegisterCommand('m8propstatus', function()
-    if not Config.Debug then return end
-
-    local count = 0
-    for _ in pairs(spawned) do count = count + 1 end
-
-    local hunt = Config.Hunt or {}
-    local msg = ('Time %02d:%02d | hunt=%s | chapter=%s | spawned=%s')
-        :format(
-            GetClockHours(),
-            GetClockMinutes(),
-            tostring(isHuntTime()),
-            tostring(currentChapter),
-            tostring(count)
-        )
-
-    print('^5[Murder of 8 Props]^0 ' .. msg)
-
-    if TriggerEvent then
-        TriggerEvent('m8:client:notify', msg)
-    end
-end, false)
-
-RegisterCommand('m8propsreload', function()
-    if not Config.Debug then return end
-
-    deleteAllProps()
-
-    if isHuntTime() then
-        TriggerEvent('m8:client:notify', 'Evidence props cleared. They will respawn nearby.')
-    else
-        TriggerEvent('m8:client:notify', 'Evidence props cleared. Daylight gate is active.')
-    end
-end, false)
-
-RegisterCommand('m8propcoords', function(_, args)
-    if not Config.Debug then return end
-
-    local id = args[1]
-
-    if not id or not M8_GetEvidenceProp or not M8_GetEvidenceProp(id) then
-        print('^1[Murder of 8 Props]^0 Usage: /m8propcoords <evidenceId>')
-        return
-    end
-
-    local ped = PlayerPedId()
-    local coords = GetEntityCoords(ped)
-    local heading = GetEntityHeading(ped)
-
-    print(('^2[Murder of 8 Props]^0 %s'):format(id))
-    print(
-        ('coords = vector4(%.4f, %.4f, %.4f, %.4f)')
-        :format(coords.x, coords.y, coords.z, heading)
-    )
-end, false)
-
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
     deleteAllProps()
 end)
 
-print('^2[Murder of 8 Props]^0 Time-gated evidence prop spawner loaded.')

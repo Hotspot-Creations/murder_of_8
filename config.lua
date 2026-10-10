@@ -1,6 +1,5 @@
 Config = {}
 
-Config.Debug = true
 Config.Interaction = 'native' -- auto | ox_target | native  (native = press E at the spot, no target zones)
 Config.OpenCasebookCommand = 'casebook'
 Config.OpenCasebookKey = 'J'

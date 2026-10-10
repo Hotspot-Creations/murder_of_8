@@ -65,7 +65,7 @@ local function setupOxTarget()
                     local zoneId = exports.ox_target:addSphereZone({
                         coords = coords,
                         radius = 1.25,
-                        debug = Config.Debug,
+                        debug = false,
                         options = {
                             {
                                 name = ('m8_%s_%s'):format(sceneId, evidenceId),
