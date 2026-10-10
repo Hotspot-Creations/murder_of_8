@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Murder of 8</title>
+
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0) !important;
+      }
+
+      #app {
+        display: none;
+      }
+
+      #app.open {
+        display: block;
+      }
+    </style>
+
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app" aria-hidden="true">
+      <div id="shade"></div>
+
+      <section id="casebook" aria-label="Murder of 8 casebook">
+        <header id="bookHeader">
+          <div class="case-brand">
+            <div id="subtitle">THE LAST WITNESS</div>
+            <h1 id="title">MURDER OF 8</h1>
+            <div class="case-rule">
+              <span>PRIVATE INVESTIGATION</span>
+              <span>FILE // VIII</span>
+            </div>
+          </div>
+        </header>
+
+        <button id="closeButton" type="button" aria-label="Close casebook">
+          ×
+        </button>
+
+        <aside id="sidebar">
+          <div class="sidebarLabel">CASE FILES</div>
+          <div id="chapterList"></div>
+        </aside>
+
+        <article id="page">
+          <div class="paper-mark paper-mark-a"></div>
+          <div class="paper-mark paper-mark-b"></div>
+          <div id="pageContent"></div>
+          <div class="page-footer">
+            <span>NOVA // FIELD NOTES</span>
+            <span>DO NOT REMOVE</span>
+          </div>
+        </article>
+      </section>
+
+      <div id="completionOverlay">
+        <div id="completionCard">
+          <div class="completionStamp">CASE UPDATED</div>
+          <div class="sidebarLabel">CHAPTER COMPLETE</div>
+          <div id="completionNumber">01</div>
+          <div id="completionText"></div>
+          <div id="completionHint"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="hauntWarning" aria-hidden="true">
+      <div class="warningCard">
+        <div id="hauntWarningTitle">THE DAY IS APPROACHING</div>
+        <div id="hauntWarningMessage"></div>
+      </div>
+    </div>
+
+    <div id="jumpScare" aria-hidden="true">
+      <div class="jumpNoise"></div>
+      <div class="jumpFigure">
+        <span class="jumpEye jumpEyeLeft"></span>
+        <span class="jumpEye jumpEyeRight"></span>
+        <span class="jumpMouth"></span>
+      </div>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
