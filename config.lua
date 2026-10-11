@@ -69,6 +69,7 @@ Config.InteriorDetection = {
         church = vec3(1803.11, 3908.12, 33.65),
         motel = vec3(1619.45, 3766.18, 34.05),
         hospital = vec3(1758.72, 3629.29, 33.58),
+        marina = vec3(1522.79, 3784.71, 33.56),
         university = vec3(1535.62, 3689.92, 34.38),
         compound = vec3(1997.83, 3788.43, 29.31)
     }

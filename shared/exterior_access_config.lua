@@ -21,23 +21,27 @@ Config.ExteriorAccess = Config.ExteriorAccess or {
 
     locations = {
         church = {
-            coords = vector3(0.0, 0.0, 0.0), -- exterior church entrance
+            coords = vector3(1782.529785, 3900.409424, 34.040485),
             label = 'Investigate the Church'
         },
         motel = {
-            coords = vector3(0.0, 0.0, 0.0), -- exterior motel investigation point
+            coords = vector3(1577.881226, 3748.834961, 34.035957),
             label = 'Investigate the Motel'
         },
         hospital = {
-            coords = vector3(0.0, 0.0, 0.0), -- exterior hospital entrance
+            coords = vector3(1762.927002, 3621.061035, 33.626545),
             label = 'Investigate the Hospital'
         },
+        maria = {
+            coords = vector3(1537.700317, 3771.182617, 33.050037),
+            label = 'Investigate the Maria'
+        },
         university = {
-            coords = vector3(0.0, 0.0, 0.0), -- exterior university/archive entrance
+            coords = vector3(1516.604492, 3698.793213, 34.211338),
             label = 'Investigate the University'
         },
         compound = {
-            coords = vector3(0.0, 0.0, 0.0), -- exterior compound investigation point
+            coords = vector3(2011.241577, 3788.030273, 31.180798),
             label = 'Investigate the Compound'
         }
     }
