@@ -2,7 +2,7 @@
 
 Complete 8-chapter standalone FiveM investigation/horror resource.
 
-Version: `1.6.6`
+Version: `1.0.2`
 
 ## Chapters
 
@@ -211,3 +211,38 @@ Debug commands:
 
 Night random scare default delay: 90-180 seconds.
 Day random scare default delay: 4-8 minutes.
+
+## v1.0.0 — Release (2026-10-10): clue placement and audio pass
+
+- Every clue point audited against the Sandy map data; hints rewritten to name what is really there
+  (ticket window instead of a clock, body bag on the morgue trolley, the illegal garage instead of
+  "the compound", motel room 32, the university pond, boat house rooms).
+- Clue points moved onto their objects: ticket, suitcases, marina key, Crowe, ticket window, eight
+  chairs, final bell. Clues backed by a spawned prop are now examined AT the prop.
+- Press E targets one clue at a time: a usable clue beats a locked or found one, then the nearest.
+- Casebook tabs unlock on the right chapter (chapter list was keyed 0-based, unlocking one early).
+- Audible cues (`Config.ClueCues`): the morgue phone and the dock knocks play from the spot while the
+  clue is open. Stuck nudge (`Config.StuckNudge`): a clue open for 5 minutes rings the bell in 3D
+  whenever you are within 25 m.
+- Voss: HELP call is 3D from the ped through the Sandy Halloween bank; stops for good once he or his
+  confession is documented, also after restarts. Nova hangs in the garage bathroom (Halloween prop).
+- Interaction radius 2.55 m (+50%), evidence glow brighter for lit interiors, admin `m8reset <id>`.
+- Escrow: `scenes.lua` and `html/**` are left readable (clue points are server-tunable, the NUI needs
+  plain files). Scripts stay escrowed.
+
+## v1.0.1 — Unescrowed release
+
+- Released fully open: no escrow on any file. Scripts, story, clue points, NUI and configs are all editable.
+
+## v1.0.2 — Exterior-only maps (2026-10-11)
+
+- New (Hotspot Creations): interior detection per building. When a server runs an exterior-only version of a
+  Sandy map, the clues inside that building are replaced by one investigation point outside it
+  (`shared/exterior_access_config.lua`), which hands out the next clue in story order.
+- New: finale fallback when the apartment interior is missing (`Config.FinaleFallback`).
+- New: admin `/m8complete <chapter>` (ace `command.m8complete`). Debug print on start removed.
+- Detection points moved one metre inside their rooms; the motel point is now the reception (the old one sat
+  under room 14, a room the motel only loads within 40 m). Detection distance 80 -> 60 m.
+- Clue sounds follow exterior mode: no phone or knocks from an unreachable spot, the stuck-nudge bell rings
+  from the outside investigation point.
+- Marina office clue moved outside by the bin at the boat rental fence; label, page text and hint updated to match.
