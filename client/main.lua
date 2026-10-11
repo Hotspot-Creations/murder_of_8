@@ -63,18 +63,29 @@ function M8_IsNearActiveScene(radius)
     local coords = GetEntityCoords(PlayerPedId())
     local checkRadius = radius or ((Config.Hunt and Config.Hunt.activeSceneRadius) or 85.0)
 
-    for _, scene in pairs(Config.Scenes) do
+    for sceneId, scene in pairs(Config.Scenes) do
         if scene.enabled and Progress.chapter >= (scene.chapter or 1) then
-            for evidenceId, sceneCoords in pairs(scene.evidence or {}) do
-                local evidenceCoords = M8_GetEvidenceWorldCoords
-                    and M8_GetEvidenceWorldCoords(evidenceId, sceneCoords)
-                    or sceneCoords
+            if M8_UsesExteriorEvidenceAccess
+                and M8_UsesExteriorEvidenceAccess(sceneId)
+            then
+                local accessCoords = M8_GetExteriorAccessCoords
+                    and M8_GetExteriorAccessCoords(sceneId)
 
-                if evidenceCoords
-                    and (evidenceCoords.x ~= 0.0 or evidenceCoords.y ~= 0.0)
-                    and #(coords - evidenceCoords) <= checkRadius
-                then
+                if accessCoords and #(coords - accessCoords) <= checkRadius then
                     return true
+                end
+            else
+                for evidenceId, sceneCoords in pairs(scene.evidence or {}) do
+                    local evidenceCoords = M8_GetEvidenceWorldCoords
+                        and M8_GetEvidenceWorldCoords(evidenceId, sceneCoords)
+                        or sceneCoords
+
+                    if evidenceCoords
+                        and (evidenceCoords.x ~= 0.0 or evidenceCoords.y ~= 0.0)
+                        and #(coords - evidenceCoords) <= checkRadius
+                    then
+                        return true
+                    end
                 end
             end
         end

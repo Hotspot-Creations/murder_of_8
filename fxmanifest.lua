@@ -10,6 +10,7 @@ ui_page 'html/index.html'
 shared_scripts {
     'config.lua',
     'scenes.lua',
+    'shared/exterior_access_config.lua',
     'shared/haunt_config.lua',
     'shared/scare_config.lua',
     'shared/scripted_scare_config.lua',
@@ -22,6 +23,7 @@ client_scripts {
     'client/native_audio.lua',
     'client/interior_detection.lua',
     'client/main.lua',
+    'client/exterior_access.lua',
     'client/interactions.lua',
     'client/clue_cues.lua',
     'client/finale.lua',

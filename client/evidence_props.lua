@@ -29,14 +29,26 @@ local function isHuntTime()
     return hour >= startHour and hour < endHour
 end
 
-local function getSceneChapter(evidenceId)
-    for _, scene in pairs(Config.Scenes or {}) do
+local function getSceneData(evidenceId)
+    for sceneId, scene in pairs(Config.Scenes or {}) do
         if scene.evidence and scene.evidence[evidenceId] then
-            return scene.chapter or 1
+            return sceneId, scene
         end
     end
 
-    return 1
+    return nil, nil
+end
+
+local function getSceneChapter(evidenceId)
+    local _, scene = getSceneData(evidenceId)
+    return scene and (scene.chapter or 1) or 1
+end
+
+local function usesExteriorAccessForEvidence(evidenceId)
+    local sceneId = getSceneData(evidenceId)
+    return sceneId
+        and M8_UsesExteriorEvidenceAccess
+        and M8_UsesExteriorEvidenceAccess(sceneId)
 end
 
 local function validCoords(coords)
@@ -100,6 +112,7 @@ local function spawnProp(prop)
     if prop.enabled == false then return end
     if not prop.model or not validCoords(prop.coords) then return end
     if not isHuntTime() then return end
+    if usesExteriorAccessForEvidence(prop.id) then return end
 
     local requiredChapter = prop.chapter or getSceneChapter(prop.id)
 
@@ -208,8 +221,10 @@ CreateThread(function()
                     ))
 
                     local spawnKey = prop.instance or prop.id
+                    local exteriorAccess = usesExteriorAccessForEvidence(prop.id) == true
 
-                    if currentChapter >= requiredChapter
+                    if not exteriorAccess
+                        and currentChapter >= requiredChapter
                         and prop.enabled ~= false
                         and distance <= spawnDistance
                     then
@@ -221,6 +236,7 @@ CreateThread(function()
                             distance > despawnDistance
                             or currentChapter < requiredChapter
                             or prop.enabled == false
+                            or exteriorAccess
                         )
                     then
                         deleteProp(spawnKey)

@@ -88,6 +88,12 @@ local function report(evidenceId, state)
     print(('[Murder of 8] clue cue %s: %s'):format(evidenceId, state))
 end
 
+
+local function usesExteriorAccess(sceneId)
+    return M8_UsesExteriorEvidenceAccess
+        and M8_UsesExteriorEvidenceAccess(sceneId)
+end
+
 CreateThread(function()
     Wait(1500)
 

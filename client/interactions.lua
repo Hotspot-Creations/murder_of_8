@@ -1,6 +1,11 @@
 local oxTargetAvailable = false
 local registeredOxZones = {}
 
+local function usesExteriorAccess(sceneId)
+    return M8_UsesExteriorEvidenceAccess
+        and M8_UsesExteriorEvidenceAccess(sceneId)
+end
+
 local function waitForScenes()
     local timeout = GetGameTimer() + 10000
 
@@ -77,6 +82,7 @@ local function setupOxTarget()
                                 label = evidence.label,
                                 distance = 1.8,
                                 canInteract = function()
+                                    if usesExteriorAccess(sceneId) then return false end
                                     local allowed = M8_CanUseEvidence(sceneId, evidenceId)
                                     return allowed
                                 end,
@@ -120,7 +126,7 @@ CreateThread(function()
         local pulse = 1.0 + g.pulse * math.sin(GetGameTimer() / 700.0) -- slow breathing, never out
 
         for sceneId, scene in pairs(Config.Scenes or {}) do
-            if scene.enabled and M8_IsSceneAccessible(sceneId) then
+            if scene.enabled and M8_IsSceneAccessible(sceneId) and not usesExteriorAccess(sceneId) then
                 for evidenceId, sceneCoords in pairs(scene.evidence or {}) do
                     local coords = M8_GetEvidenceWorldCoords
                         and M8_GetEvidenceWorldCoords(evidenceId, sceneCoords)
@@ -166,7 +172,7 @@ CreateThread(function()
         local found = (M8_GetProgress and M8_GetProgress() or {}).evidence or {}
 
         for sceneId, scene in pairs(Config.Scenes or {}) do
-            if scene.enabled and M8_IsSceneAccessible(sceneId) then
+            if scene.enabled and M8_IsSceneAccessible(sceneId) and not usesExteriorAccess(sceneId) then
                 for evidenceId, sceneCoords in pairs(scene.evidence or {}) do
                     local coords = M8_GetEvidenceWorldCoords
                         and M8_GetEvidenceWorldCoords(evidenceId, sceneCoords)
