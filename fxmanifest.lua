@@ -3,7 +3,7 @@ game 'gta5'
 
 author 'Hotspot Creations & Prompt Studios'
 description 'Murder of 8 - standalone Halloween investigation resource for sandy shores halloween event!'
-version '1.0.1'
+version '1.0.2'
 
 ui_page 'html/index.html'
 
@@ -50,12 +50,5 @@ files {
 }
 
 escrow_ignore {
-    'config.lua',
-    'scenes.lua',        -- clue points and physical props: server owners tune these
-    'html/**',           -- the casebook NUI must stay readable by the browser
-    'README.md',
-    'shared/haunt_config.lua',
-    'shared/scare_config.lua',
-    'shared/scripted_scare_config.lua',
-    'shared/native_audio_config.lua'
+    '**' -- released unescrowed: every file stays readable and editable
 }

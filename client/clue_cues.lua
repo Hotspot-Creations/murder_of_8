@@ -44,6 +44,15 @@ function M8ClueCues.NudgeDue(nudge, openSince, lastAt, now, distance)
     return now - lastAt >= (nudge.interval or 45000)
 end
 
+-- pure: where a sound plays from. In a building whose interior is missing (exterior-only map, see
+-- exterior_access.lua) the clue spot is unreachable: its own cue stays silent and the stuck nudge rings
+-- from the outside access point instead.
+function M8ClueCues.Spot(kind, exterior, evidenceCoords, accessCoords)
+    if not exterior then return evidenceCoords end
+    if kind == 'nudge' then return accessCoords end
+    return nil
+end
+
 local function clamp(v, lo, hi)
     if v < lo then return lo end
     if v > hi then return hi end
@@ -138,9 +147,15 @@ CreateThread(function()
                         local coords = M8_GetEvidenceWorldCoords
                             and M8_GetEvidenceWorldCoords(evidenceId, sceneCoords)
                             or sceneCoords
+                        local exterior = usesExteriorAccess(sceneId) == true
+                        local access = exterior and M8_GetExteriorAccessCoords and M8_GetExteriorAccessCoords(sceneId) or nil
+                        local cueAt = M8ClueCues.Spot('cue', exterior, coords, access)
+                        local nudgeAt = M8ClueCues.Spot('nudge', exterior, coords, access)
                         local distance = #(me - coords)
 
-                        if cue then
+                        if cue and not cueAt then
+                            report(evidenceId, 'building has no interior here - cue off')
+                        elseif cue then
                             if distance > (cue.range or DEFAULT_RANGE) then
                                 report(evidenceId, 'open, out of range')
                             else
@@ -153,11 +168,12 @@ CreateThread(function()
                             end
                         end
 
-                        if nudge and M8ClueCues.NudgeDue(nudge, openSince[evidenceId], nudgedAt[evidenceId], now, distance) then
+                        local nudgeDistance = nudgeAt and #(me - nudgeAt) or math.huge
+                        if nudge and nudgeAt and M8ClueCues.NudgeDue(nudge, openSince[evidenceId], nudgedAt[evidenceId], now, nudgeDistance) then
                             nudgedAt[evidenceId] = now
                             print(('[Murder of 8] stuck nudge %s: %s at %.1f m, open for %d s'):format(
-                                evidenceId, nudge.sound or 'bell', distance, (now - openSince[evidenceId]) // 1000))
-                            playAt(nudge.sound or 'bell', coords, nudge, distance)
+                                evidenceId, nudge.sound or 'bell', nudgeDistance, (now - openSince[evidenceId]) // 1000))
+                            playAt(nudge.sound or 'bell', nudgeAt, nudge, nudgeDistance)
                         end
                     end
                 end

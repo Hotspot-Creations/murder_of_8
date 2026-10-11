@@ -56,7 +56,7 @@ Config.InteriorDetection = {
 
     -- How close the player must be to the test point before we ask GTA/FiveM
     -- whether an interior exists there.
-    checkDistance = 80.0,
+    checkDistance = 60.0, -- inside every interior's own streaming range (the motel loads its rooms at 40-70 m)
 
     -- Time between re-checks for a location currently considered exterior.
     exteriorRecheckMs = 10000,
@@ -66,10 +66,10 @@ Config.InteriorDetection = {
     confirmationIntervalMs = 500,
 
     points = {
-        church = vec3(1803.11, 3908.12, 33.65),
-        motel = vec3(1619.45, 3766.18, 34.05),
-        hospital = vec3(1758.72, 3629.29, 33.58),
-        marina = vec3(1522.79, 3784.71, 33.56),
+        church = vec3(1803.11, 3908.12, 34.65),
+        motel = vec3(1586.54, 3744.38, 35.04),      -- motel reception (Venn); was the bottom edge of room 14
+        hospital = vec3(1758.72, 3629.29, 34.58),
+        marina = vec3(1522.79, 3784.71, 34.56),
         university = vec3(1535.62, 3689.92, 34.38),
         compound = vec3(1997.83, 3788.43, 29.31)
     }

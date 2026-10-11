@@ -511,9 +511,9 @@ The same phrase appears in the old missing-person reports.]],
                 note = 'Mercer controlled the case and the physical evidence.'
             },
             evidence_boxes = {
-                label = 'Search the office for files', shortTitle = 'DESTROYED',
-                hint = "Mercer kept an office by the water: the boat rental, at the west end of the marina. Evidence he claimed to destroy would be in it.",
-                body = [[Old police evidence files lined the office.
+                label = 'Search the dumped files', shortTitle = 'DESTROYED',
+                hint = "Mercer kept an office by the water: the boat rental, at the west end of the marina. What he claimed to destroy never made it back inside. It was left by the bin at the fence.",
+                body = [[Old police evidence files, dumped by the bin outside the office.
 
 One has been resealed.
 
