@@ -1,20 +1,6 @@
 local oxTargetAvailable = false
 local registeredOxZones = {}
 
-CreateThread(function()
-    Wait(2000)
-
-    print('^5[M8 DEBUG] CLIENT CONFIG CHECK^0')
-    print('Config exists:', Config ~= nil)
-    print('Config.Scenes exists:', Config and Config.Scenes ~= nil)
-
-    if Config and Config.Scenes then
-        for sceneId, _ in pairs(Config.Scenes) do
-            print('^2[M8 DEBUG] Scene:', sceneId, '^0')
-        end
-    end
-end)
-
 local function waitForScenes()
     local timeout = GetGameTimer() + 10000
 
@@ -28,6 +14,24 @@ local function waitForScenes()
     end
 
     return true
+end
+
+-- one target per key press: a clue you can use now beats a locked or already-found one, then the nearest
+function M8_PickEvidence(candidates)
+    local best
+
+    for _, c in ipairs(candidates or {}) do
+        local usable = c.allowed == true
+        local bestUsable = best and best.allowed == true
+
+        if not best
+            or (usable and not bestUsable)
+            or (usable == bestUsable and c.distance < best.distance) then
+            best = c
+        end
+    end
+
+    return best
 end
 
 local function drawText3D(coords, text)
@@ -156,6 +160,11 @@ CreateThread(function()
         local ped = PlayerPedId()
         local pCoords = GetEntityCoords(ped)
 
+        -- clues can sit within a metre of each other (the ticket window and the clerk's letter):
+        -- gather everything in reach, then prompt for and examine ONE of them
+        local candidates = {}
+        local found = (M8_GetProgress and M8_GetProgress() or {}).evidence or {}
+
         for sceneId, scene in pairs(Config.Scenes or {}) do
             if scene.enabled and M8_IsSceneAccessible(sceneId) then
                 for evidenceId, sceneCoords in pairs(scene.evidence or {}) do
@@ -179,16 +188,29 @@ CreateThread(function()
                                     label = 'Examine'
                                 end
 
-                                drawText3D(coords + vector3(0.0, 0.0, 0.25), ('~g~[E]~s~ %s'):format(label))
-
-                                if IsControlJustReleased(0, Config.InteractKey) then
-                                    M8_ExamineEvidence(sceneId, evidenceId)
-                                    Wait(350)
-                                end
+                                candidates[#candidates + 1] = {
+                                    sceneId = sceneId,
+                                    evidenceId = evidenceId,
+                                    coords = coords,
+                                    distance = distance,
+                                    allowed = allowed and not found[evidenceId],
+                                    label = label
+                                }
                             end
                         end
                     end
                 end
+            end
+        end
+
+        local target = M8_PickEvidence(candidates)
+
+        if target then
+            drawText3D(target.coords + vector3(0.0, 0.0, 0.25), ('~g~[E]~s~ %s'):format(target.label))
+
+            if IsControlJustReleased(0, Config.InteractKey) then
+                M8_ExamineEvidence(target.sceneId, target.evidenceId)
+                Wait(350)
             end
         end
 

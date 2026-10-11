@@ -39,6 +39,7 @@ M8HalloweenAudio.Map = {
     impact         = { silent = true },                   -- the scream is the hit; no 2D clang on top
     metal_clang    = { sound = 'promptsh_m8_cell_slam',    back = 3.0,  up = 0.5,  hold = 6000, fromSpot = true },
     cell_slam      = { sound = 'promptsh_m8_cell_slam',    back = 3.0,  up = 0.5,  hold = 6000, fromSpot = true },
+    voss_help      = { sound = 'promptsh_m8_voss_help',    back = 2.0,  up = 0.5,  hold = 4500, fromSpot = true }, -- from the Voss ped
     coffin_knocks  = { sounds = { 'promptsh_knock_01', 'promptsh_knock_02', 'promptsh_knock_03' },
                        pattern = { 0, 520, 610 }, back = 2.0, up = 0.15, hold = 3000, fromSpot = true },
     dock_knocks    = { sounds = { 'promptsh_knock_under' },                          -- 3 / 3 / 2 = 8

@@ -1,12 +1,16 @@
 local churchInterior = nil
 
+-- Inside the nave, halfway between the entrance doors (1784, 3902) and the exit door (1805, 3920).
+-- (1767, 3892 was 16 m outside the south-west wall: GetInteriorAtCoords returned 0 there.)
 local CHURCH_COORDS = vector3(
-    1767.54,
-    3891.87,
-    36.64
+    1795.0,
+    3910.5,
+    35.5
 )
 
 local FUNERAL_SET = 'church_funeral'
+local OTHER_SETS = { 'church_married', 'church_service' }
+local restoreSets = nil -- whatever was active before the funeral; put back in daylight / on stop
 
 local function getChurchInterior()
     if churchInterior and churchInterior ~= 0 then
@@ -31,8 +35,13 @@ local function enableChurchFuneral()
 
     PinInteriorInMemory(interior)
 
-    DeactivateInteriorEntitySet(interior, 'church_married')
-    DeactivateInteriorEntitySet(interior, 'church_service')
+    restoreSets = {}
+    for _, set in ipairs(OTHER_SETS) do
+        if IsInteriorEntitySetActive(interior, set) then
+            restoreSets[#restoreSets + 1] = set
+            DeactivateInteriorEntitySet(interior, set)
+        end
+    end
 
     ActivateInteriorEntitySet(interior, FUNERAL_SET)
 
@@ -49,6 +58,12 @@ local function disableChurchFuneral()
     end
 
     DeactivateInteriorEntitySet(interior, FUNERAL_SET)
+
+    for _, set in ipairs(restoreSets or {}) do
+        ActivateInteriorEntitySet(interior, set)
+    end
+    restoreSets = nil
+
     RefreshInterior(interior)
 end
 

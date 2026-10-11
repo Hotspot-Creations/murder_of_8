@@ -109,6 +109,58 @@ RegisterNetEvent('m8:server:findEvidence', function(evidenceId)
     sendProgress(src)
 end)
 
+
+-- Admin-only chapter completion shortcut used by /m8complete on the client.
+-- Permission: add_ace group.admin command.m8complete allow
+RegisterNetEvent('m8:server:completeChapter', function(chapterIndex)
+    local src = source
+
+    if src <= 0 or not IsPlayerAceAllowed(src, 'command.m8complete') then
+        TriggerClientEvent('m8:client:notify', src, 'You do not have permission to use /m8complete.')
+        return
+    end
+
+    chapterIndex = tonumber(chapterIndex)
+    if not chapterIndex then return end
+
+    chapterIndex = math.floor(chapterIndex)
+    if chapterIndex < 1 or chapterIndex > #M8Story.Chapters then return end
+
+    local progress = getProgress(src)
+    local chapter = M8Story.Chapters[chapterIndex]
+    if not chapter then return end
+
+    for _, evidenceId in ipairs(chapter.requiredEvidence or {}) do
+        progress.evidence[evidenceId] = true
+    end
+
+    progress.completed[chapterIndex] = true
+
+    if chapterIndex < #M8Story.Chapters then
+        progress.chapter = math.max(progress.chapter, chapterIndex + 1)
+    else
+        progress.chapter = #M8Story.Chapters
+    end
+
+    sendProgress(src)
+    TriggerClientEvent('m8:client:chapterComplete', src, chapterIndex)
+    TriggerClientEvent('m8:client:notify', src, ('Chapter %d marked complete.'):format(chapterIndex))
+end)
+
+-- Admin reset from the server console / txAdmin: m8reset <serverId>. Restricted (console, or the
+-- command.m8reset ace). Wipes that player's saved case so they can replay or get unstuck.
+RegisterCommand('m8reset', function(source, args)
+    local target = tonumber(args[1])
+    if not target or not GetPlayerName(target) then
+        print('[Murder of 8] usage: m8reset <serverId>  (the player must be online)')
+        return
+    end
+    PlayerProgress[target] = blankProgress()
+    sendProgress(target)
+    TriggerClientEvent('m8:client:notify', target, 'Your case has been reset.')
+    print(('[Murder of 8] progress reset for %s (%d)'):format(GetPlayerName(target), target))
+end, true)
+
 AddEventHandler('playerDropped', function()
     PlayerProgress[source] = nil
 end)

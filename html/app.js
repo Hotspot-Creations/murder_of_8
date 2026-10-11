@@ -70,6 +70,16 @@
     completionOverlay.classList.remove("show");
     nuiPost("close");
   }
+  // M8Story.Chapters is a Lua array [1..8]; it arrives here as a JS array [0..7]. Progress.chapter is
+  // 1-based, so key the chapters 1..n or every tab unlocks one early and J opens on the next chapter.
+  function keyedChapters(list) {
+    if (!Array.isArray(list)) return list || {};
+    var out = {};
+    list.forEach(function (chapter, i) {
+      out[i + 1] = chapter;
+    });
+    return out;
+  }
   function isUnlocked(index) {
     return index <= Number(state.progress.chapter || 1);
   }
@@ -862,7 +872,7 @@
         titleEl.textContent = data.title || "MURDER OF 8";
         subtitleEl.textContent = data.subtitle || "THE LAST WITNESS";
         if (data.progress) state.progress = data.progress;
-        if (data.chapters) state.chapters = data.chapters;
+        if (data.chapters) state.chapters = keyedChapters(data.chapters);
         var focused = findChapterForEvidence(pendingFocusEvidence);
         if (focused && isUnlocked(focused)) state.selectedChapter = focused;
         else if (!isUnlocked(state.selectedChapter))

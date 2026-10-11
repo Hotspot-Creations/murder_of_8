@@ -6,9 +6,9 @@ local fixes = {
         -- It only needs to be close enough for the script to identify
         -- the correct bag.
         coords = vector3(
-            1515.48,
-            3786.14,
-            37.22
+            1492.95,
+            3923.76,
+            30.61
         ),
 
         radius = 10.0

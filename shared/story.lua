@@ -14,7 +14,7 @@ M8Story.Chapters = {
         evidence = {
             rusk_body = {
                 label = 'Examine Elias Rusk', shortTitle = 'ELIAS RUSK',
-                hint = "A fire inspector does not die in a fire. Look for what the flames left hanging.",
+                hint = "A fire inspector does not die in a fire. He went down behind the house, by the table with the bottles. One boot is still there.",
                 body = [[ELIAS RUSK
 
 Former fire inspector.
@@ -30,7 +30,7 @@ A strip of black cloth covered his mouth. A metal tag hung from his neck:
             },
             fire_report = {
                 label = 'Read the fire report', shortTitle = 'FIRE REPORT',
-                hint = "Rusk signed every inspection in Sandy. His last one is still somewhere in the house.",
+                hint = "Rusk signed every inspection in Sandy. His last one never made it inside. Check the mailbox at the front fence.",
                 body = [[SANDY SHORES FIRE INSPECTION
 
 IGNITION: 2:08 AM
@@ -91,7 +91,7 @@ THE SECOND LIED TO GOD."]],
         evidence = {
             vale_body = {
                 label = 'Examine Father Vale', shortTitle = 'FATHER GIDEON VALE',
-                hint = "A priest is put on display where he preached. Where his congregation once watched him.",
+                hint = "A priest is not put on display where he preached. He is underneath it: the root cellar below the church. Follow the blood.",
                 body = [[FATHER GIDEON VALE
 
 Former church administrator.
@@ -108,7 +108,7 @@ NOT PEOPLE."]],
             },
             burial_ledger = {
                 label = 'Read the burial ledger', shortTitle = 'THE BURIAL LEDGER',
-                hint = "Eight funerals, every one signed. Find where Vale kept his books.",
+                hint = "Eight funerals, every one signed. Vale kept his books at the altar, among the candles.",
                 body = [[Eight funerals were recorded during the week of the disappearances.
 
 Every entry carries Vale's signature.
@@ -272,7 +272,7 @@ The tape ends.]],
             },
             hospital_wristband = {
                 label = 'Take the hospital wristband', shortTitle = '2:08 AM',
-                hint = "A hospital band does not belong in a motel. Somebody left it on a table on their way out.",
+                hint = "A hospital band does not belong in a motel. The carvings say they were moved out of room 32: upstairs, far end of the walkway. A pill bottle still sits on the table in there. The band is under it.",
                 prerequisites = { 'motel_recorder' },
                 body = [[A hospital wristband was laying on a table.
 
@@ -297,7 +297,7 @@ On the back:
         requiredEvidence = { 'harrow_body', 'transfer_records', 'false_identities', 'nova_body_bag', 'train_manifest' },
         completionText = 'THEY ERASED THE DEAD TWICE.\n\nFIRST THE BODY.\nTHEN THE NAME.',
         nextHint = 'THE TRAIN NEVER CAME.',
-        placeHint = 'The manifest was stamped at the station office. The platform clock stopped at 2:08.',
+        placeHint = 'The manifest was stamped at the station ticket window. The stamp there never moved past 2:08.',
         evidence = {
             harrow_body = {
                 label = 'Examine Dr. Harrow', shortTitle = 'DR. LENORA HARROW',
@@ -319,7 +319,7 @@ Across the steel table:
             },
             transfer_records = {
                 label = 'Read the transfer records', shortTitle = 'TRANSFERRED',
-                hint = "Eight transfers before sunrise. Transfers leave paperwork, and paperwork gets filed.",
+                hint = "Eight transfers before sunrise. Transfers leave paperwork, and paperwork gets filed in the archive room.",
                 body = [[Eight bodies were supposedly transferred out of Sandy before sunrise.
 
 The hospitals exist.
@@ -333,7 +333,7 @@ All eight forms were created at exactly 2:08 AM.]],
             },
             false_identities = {
                 label = 'Open the sealed envelopes', shortTitle = 'EIGHT FALSE NAMES',
-                hint = "Eight death certificates for eight strangers, sealed. Harrow filed them where the dead are filed.",
+                hint = "Eight death certificates for eight strangers, sealed. Harrow kept them in the downstairs office off the corridor, not with the dead.",
                 prerequisites = { 'transfer_records' },
                 body = [[Eight envelopes. Each contains a name, birth date, death certificate and fabricated next of kin.
 
@@ -346,14 +346,14 @@ Then legally.]],
                 note = 'Harrow replaced eight missing people with eight unrelated deaths.'
             },
             nova_body_bag = {
-                label = 'Open the ringing drawer', shortTitle = 'NOVA',
-                hint = "Listen. One of the drawers is ringing.",
+                label = 'Open the ringing body bag', shortTitle = 'NOVA',
+                hint = "Listen. Something is ringing on the trolley by the morgue sink, a few steps from Harrow's table. Follow the sound.",
                 prerequisites = { 'false_identities' }, scare = 'phone_ring',
-                body = [[A phone rings from inside a morgue drawer.
+                body = [[A phone rings from inside the body bag on the trolley.
 
 There is no phone.
 
-Only a body bag.
+Only the bag.
 
 The toe tag reads:
 
@@ -370,7 +370,7 @@ Written inside the plastic:
             },
             train_manifest = {
                 label = 'Take the train manifest', shortTitle = 'THE DEPARTURE',
-                hint = "Dead men do not buy tickets. Someone in this morgue kept proof that they did.",
+                hint = "Dead men do not buy tickets. The proof was kept where the living check in: the front desk in reception, by the entrance.",
                 prerequisites = { 'nova_body_bag' },
                 body = [[Eight passengers supposedly left Sandy the morning after the disappearances.
 
@@ -412,13 +412,13 @@ NOWHERE]],
                 note = 'Crowe created the records that made the victims appear to leave.'
             },
             frozen_clock = {
-                label = 'Inspect the station clock', shortTitle = '2:08',
-                hint = "Every clock in Sandy works but one.",
-                body = [[The station clock is frozen at 2:08.
+                label = 'Inspect the ticket window', shortTitle = '2:08',
+                hint = "Crowe stamped every ticket at his window. The stamp never moved past the minute they started.",
+                body = [[The clerk's time stamp at the ticket window is jammed at 2:08.
 
-Every other clock nearby worked.
+Every ticket stamped that night carries the same minute.
 
-Scratched into the glass:
+Scratched into the counter beside it:
 
 "THIS IS WHEN THEY STARTED CLEANING."]],
                 note = '2:08 may mark the beginning of the cover-up, not the deaths.'
@@ -453,13 +453,17 @@ If you're reading this, then he found me first."]],
                 note = 'Crowe knew someone was hunting the people involved.'
             },
             fake_departure = {
-                label = 'Check the timetable', shortTitle = 'NO TRAIN',
-                hint = "The manifest says 2:16. The station timetable will say otherwise.",
+                label = 'Pick up the dropped ticket', shortTitle = 'NO TRAIN',
+                hint = "The manifest says 2:16. Somebody dropped a ticket on the station floor. Pick it up.",
                 prerequisites = { 'train_manifest' }, scare = 'train_horn',
-                body = [[The historical timetable confirmed it.
+                body = [[A ticket, dropped on the station floor.
 
-No passenger train stopped at 2:16 AM.
-No freight stop either.
+Same serial number as the eight in the manifest. Stamped by Crowe.
+
+DEPARTURE: 2:16 AM
+
+The timetable on the wall has no train at 2:16 AM.
+No passenger service. No freight stop either.
 
 Crowe invented a departure for a train that never came.]],
                 note = 'A horn sounds after you finish reading. No train appears.'
@@ -486,11 +490,11 @@ WAS THROWN INTO THE WATER."]],
         requiredEvidence = { 'mercer_body', 'evidence_boxes', 'weighted_cache', 'mercer_tape', 'dock_message', 'university_file' },
         completionText = "THE SHERIFF DIDN'T CLOSE THE CASE.\n\nHE DROWNED IT.",
         nextHint = 'NOVA WAS HERE.',
-        placeHint = 'The file carries the university archive stamp. Nova studied there.',
+        placeHint = 'The file carries the university archive stamp. Nova studied there. The archive is the university itself. Start at the pond on the campus grounds.',
         evidence = {
             mercer_body = {
                 label = 'Examine Abel Mercer', shortTitle = 'SHERIFF ABEL MERCER',
-                hint = "A sheriff with a chain on his ankle does not sink. He floats where the water is deep enough to hold him.",
+                hint = "A sheriff with a chain on his ankle does not sink. He floats out past the rocks, north of the long dock.",
                 body = [[ABEL MERCER
 
 Former Sheriff.
@@ -508,7 +512,7 @@ The same phrase appears in the old missing-person reports.]],
             },
             evidence_boxes = {
                 label = 'Search the office for files', shortTitle = 'DESTROYED',
-                hint = "Mercer kept an office by the water. Evidence he claimed to destroy would be in it.",
+                hint = "Mercer kept an office by the water: the boat rental, at the west end of the marina. Evidence he claimed to destroy would be in it.",
                 body = [[Old police evidence files lined the office.
 
 One has been resealed.
@@ -524,7 +528,7 @@ None of them are empty.]],
             },
             weighted_cache = {
                 label = 'Inspect the trash can', shortTitle = 'THE LAKE',
-                hint = "Not everything fit in evidence bags. What did not fit was thrown away, not far from the office.",
+                hint = "Not everything fit in evidence bags. The rest went in a bin, in the restroom of the boat house across the marina.",
                 prerequisites = { 'evidence_boxes' },
                 body = [[A old folder held IDs, motel keys, church paperwork, medical tags and photographs.
 
@@ -537,7 +541,7 @@ It did not erase them.]],
             },
             mercer_tape = {
                 label = "Play Mercer's tape", shortTitle = "THAT'S HOW PLACES ROT",
-                hint = "Mercer recorded his own conversations. The tape will be near the rest of his hoard.",
+                hint = "Mercer recorded his own conversations. The tape is upstairs in the boat house, on the floor among his wine.",
                 prerequisites = { 'weighted_cache' },
                 body = [[Mercer:
 
@@ -552,7 +556,7 @@ Nova:
             },
             dock_message = {
                 label = 'Listen beneath the dock', shortTitle = '3 - 3 - 2',
-                hint = "Three, three, two. Go out on the dock at night and listen under the boards.",
+                hint = "Three, three, two. Go out on the long dock with the telescope at night and listen under the boards.",
                 prerequisites = { 'mercer_tape' }, scare = 'dock_knocks',
                 body = [[Three knocks.
 Pause.
@@ -571,7 +575,7 @@ On the underside of the boards:
             },
             university_file = {
                 label = 'Take the archive file', shortTitle = 'NOVA',
-                hint = "HE FOUND THE ARCHIVE, the boards said. A sealed file is waiting back by the boat house.",
+                hint = "HE FOUND THE ARCHIVE, the boards said. A sealed file is waiting back in the boat house, on the reception desk.",
                 prerequisites = { 'dock_message' },
                 body = [[A sealed police file carries a university archive stamp.
 
@@ -594,11 +598,11 @@ FIND THE PERSON WHO WRITES IT."]],
         requiredEvidence = { 'kade_body', 'archive_wall', 'nova_journal', 'nova_last_recording', 'compound_photo', 'fresh_message' },
         completionText = "NOVA DIDN'T LEAD YOU HERE.\n\nSOMEBODY IS USING HIS CORPSE AS A MAP.",
         nextHint = 'COME FINISH THE STORY.',
-        placeHint = 'The photograph shows the fenced compound past the edge of town. Eight chairs inside.',
+        placeHint = 'The photograph shows the illegal garage past the east edge of town, by the gas station. Eight chairs in the pit beneath it.',
         evidence = {
             kade_body = {
                 label = 'Examine Evelyn Kade', shortTitle = 'EVELYN KADE',
-                hint = "The archivist was left in water, eyes covered. Not the lake this time. Somewhere on the campus.",
+                hint = "The archivist was left in water, eyes covered. Not the lake this time. The pond on the campus grounds, the one ringed with lamps.",
                 body = [[PROFESSOR EVELYN KADE
 
 Former municipal archivist.
@@ -614,7 +618,7 @@ EDITOR]],
             },
             archive_wall = {
                 label = 'Study the evidence wall', shortTitle = 'SOMEONE GOT HERE FIRST',
-                hint = "Nova pinned everything he knew to one wall of the archive.",
+                hint = "Nova pinned everything he knew to one wall of the classroom with the projector.",
                 prerequisites = { 'kade_body' },
                 body = [[The burning house. The church. The motel. The morgue. The station. The marina.
 
@@ -627,7 +631,7 @@ The investigation is old.]],
             },
             nova_journal = {
                 label = "Read Nova's journal", shortTitle = 'EIGHT YEARS AGO',
-                hint = "A man who pins his case to a wall keeps his journal within reach of it.",
+                hint = "A man who pins his case to a wall keeps his journal within reach of it. He wrote it at the one table a whole room of seats faces, and let the coffee go cold.",
                 prerequisites = { 'archive_wall' },
                 body = [[Nova's final page:
 
@@ -646,7 +650,7 @@ If I'm right, this ends tomorrow."]],
             },
             nova_last_recording = {
                 label = "Play Nova's final recording", shortTitle = 'DO NOT FOLLOW THE NOTES',
-                hint = "The journal ends mid-sentence. Nova finished the thought out loud, on tape, somewhere in the archive.",
+                hint = "The journal ends mid-sentence. Nova finished the thought out loud, on tape. Ground floor, east side of the building: on the floor by the bin, under the wall clock.",
                 prerequisites = { 'nova_journal' }, scare = 'archive_bell',
                 body = [[Nova:
 
@@ -669,7 +673,7 @@ The recording ends.]],
             },
             compound_photo = {
                 label = 'Examine the compound photograph', shortTitle = 'WHERE THEY TOOK THE EIGHT',
-                hint = "I found where they took the bodies, he wrote. He photographed it. Find the photograph.",
+                hint = "I found where they took the bodies, he wrote. He photographed it. The photograph is in the trophy cabinet by the lecture hall doors, at the north end of the ground floor.",
                 prerequisites = { 'nova_last_recording' },
                 body = [[A photograph shows the Compound.
 
@@ -684,7 +688,7 @@ Another sentence sits beneath it in different handwriting and fresh ink:
             },
             fresh_message = {
                 label = 'Read the fresh message', shortTitle = 'COME FINISH THE STORY',
-                hint = "The paint is wet. Whoever wrote it is still here. Find the wall.",
+                hint = "The paint is wet. Whoever wrote it is still here. The wall under the east stairs, by the bin.",
                 prerequisites = { 'compound_photo' }, scare = 'archive_blackout',
                 body = [[The lights die.
 
@@ -704,14 +708,14 @@ Beneath it is the outline of a brass bell.]],
 
     [8] = {
         id = 'compound', number = '08', title = 'THE LAST WITNESS',
-        location = 'The Compound',
+        location = 'The Illegal Garage',
         intro = 'You are no longer investigating a crime scene. You have entered the place where the crime was designed.',
         requiredEvidence = { 'eight_chairs', 'surveillance_wall', 'nova_body', 'voss', 'voss_confession', 'final_bell', 'last_message' },
         completionText = 'NOW YOU KNOW.\n\nTHAT MAKES YOU THE LAST WITNESS.',
         evidence = {
             eight_chairs = {
                 label = 'Examine the eight chairs', shortTitle = 'EIGHT CHAIRS',
-                hint = "Eight chairs facing a wall. Start there.",
+                hint = "Eight chairs facing a wall. Start there. The garage has a secret floor beneath it, past the vault doors.",
                 body = [[Eight chairs face an empty wall.
 
 Seven contain evidence from the previous scenes.
@@ -824,7 +828,7 @@ Not the bell."]],
             },
             final_bell = {
                 label = 'Ring the final bell', shortTitle = 'THE BELLMAN',
-                hint = "An old bell by the wall. You know what it does by now.",
+                hint = "A button on the pit wall, wired to an old bell. You know what it does by now.",
                 prerequisites = { 'voss_confession' }, scare = 'final_blackout',
                 body = [[An old bell rests on the near the wall.
 

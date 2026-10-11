@@ -65,12 +65,12 @@ Config.Scenes = {
         enabled = true,
         timeRestricted = false,
         evidence = {
-            crowe_body = vector3(1933.13, 3579.86, 38.60),
-            frozen_clock = vector3(1915.86, 3568.22, 38.48),
-            eight_suitcases = vector3(1915.74, 3581.36, 38.81),
+            crowe_body = vector3(1910.986, 3570.935, 38.817), -- on the platform (heading 212.585 if a body prop is added later)
+            frozen_clock = vector3(1897.93, 3576.30, 38.77), -- the ticket window (position taken in game)
+            eight_suitcases = vector3(1903.966, 3572.455, 38.819), -- position taken in game (heading 168.792)
             crowe_letter = vector3(1897.84, 3575.45, 38.81),
-            fake_departure = vector3(1893.69, 3578.24, 38.81),
-            marina_key = vector3(1913.34, 3589.82, 38.81)
+            fake_departure = vector3(1901.72, 3579.0, 38.60), -- the dropped ticket prop (was 8 m away)
+            marina_key = vector3(1903.966, 3572.455, 38.819) -- in the eighth suitcase, same spot as eight_suitcases
         }
     },
     marina = {
@@ -104,12 +104,12 @@ Config.Scenes = {
         enabled = true,
         timeRestricted = false,
         evidence = {
-            eight_chairs = vector3(1989.06, 3790.15, 28.03),
+            eight_chairs = vector3(1975.04, 3780.82, 27.90), -- on the chair row (chair_2); was at the pit bottom 16 m away
             surveillance_wall = vector3(1992.09, 3786.79, 35.39),
             nova_body = vector3(1998.63, 3782.87, 35.16),
             voss = vec3(1978.71, 3774.67, 27.37),
             voss_confession = vec3(1978.39, 3776.68, 27.37),
-            final_bell = vector3(1989.57, 3780.58, 28.34),
+            final_bell = vector3(1990.12, 3781.93, 28.60), -- the button on the pit wall
             last_message = vec3(1637.58, 3520.47, 49.49)
         }
     }
@@ -150,6 +150,15 @@ Config.EvidenceProps = {
         id = "compound_photo",
         model = "darkvanar_halloween_pic_01",
         coords = vector4(1533.8131, 3706.9414, 36.0187, 23.82)
+    },
+    -- Nova, hanging in the garage bathroom (chapter 8). Separate instance key so the examine point stays at
+    -- the scene coords instead of jumping to the rope origin.
+    {
+        id = "nova_body",
+        instance = "nova_hanging",
+        model = "darkvanar_halloween_hanging_corpse_01",
+        coords = vector4(1998.63, 3782.87, 35.10, 90.0), -- rope top at the 2.8 m ceiling, feet just off the floor
+        collision = false
     },
     -- 8  chairs
     {

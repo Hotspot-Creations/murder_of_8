@@ -366,6 +366,97 @@ local function showCredits()
     })
 end
 
+local function getFallbackConfig()
+    return (Config and Config.FinaleFallback) or {}
+end
+
+local function isConfiguredCoord(coords)
+    if not coords then return false end
+
+    return math.abs(coords.x or 0.0) > 0.001
+        or math.abs(coords.y or 0.0) > 0.001
+        or math.abs(coords.z or 0.0) > 0.001
+end
+
+local function clearRemoteInteriorProbe()
+    ClearFocus()
+end
+
+local function hasFinaleInterior()
+    local destination = Finale.bed
+    local fallback = getFallbackConfig()
+    local timeoutMs = fallback.interiorCheckTimeoutMs or 5000
+    local intervalMs = fallback.interiorCheckIntervalMs or 100
+
+    -- First try without forcing a remote stream; this is instant when the MLO
+    -- is already resident on the client.
+    local interiorId = GetInteriorAtCoords(
+        destination.x,
+        destination.y,
+        destination.z
+    )
+
+    if interiorId and interiorId ~= 0 then
+        return true, interiorId
+    end
+
+    -- The finale room is away from the compound. While the screen is black,
+    -- temporarily focus its coordinates so custom map data has a chance to
+    -- stream before we decide that this server is exterior-only.
+    SetFocusPosAndVel(
+        destination.x,
+        destination.y,
+        destination.z,
+        0.0,
+        0.0,
+        0.0
+    )
+
+    local timeout = GetGameTimer() + timeoutMs
+
+    while sequenceRunning and GetGameTimer() < timeout do
+        RequestCollisionAtCoord(
+            destination.x,
+            destination.y,
+            destination.z
+        )
+
+        interiorId = GetInteriorAtCoords(
+            destination.x,
+            destination.y,
+            destination.z
+        )
+
+        if interiorId and interiorId ~= 0 then
+            clearRemoteInteriorProbe()
+            return true, interiorId
+        end
+
+        Wait(intervalMs)
+    end
+
+    clearRemoteInteriorProbe()
+    return false, 0
+end
+
+local function teleportToFallback(coords)
+    local ped = PlayerPedId()
+
+    SetEntityCoordsNoOffset(
+        ped,
+        coords.x,
+        coords.y,
+        coords.z,
+        false,
+        false,
+        false
+    )
+
+    SetEntityHeading(ped, coords.w or 0.0)
+    SetGameplayCamRelativeHeading(0.0)
+    SetGameplayCamRelativePitch(0.0, 1.0)
+end
+
 local function teleportToBed()
     local ped = PlayerPedId()
 
@@ -546,6 +637,7 @@ local function resetFinale()
     sequenceRunning = false
     lastMessageSaved = false
 
+    clearRemoteInteriorProbe()
     clearFinaleText()
     deleteBody()
     deleteWallText()
@@ -557,6 +649,74 @@ local function resetFinale()
         FreezeEntityPosition(ped, false)
         ClearPedTasks(ped)
     end
+end
+
+local function runExteriorFallback()
+    local fallback = getFallbackConfig()
+    local coords = fallback.coords
+
+    if fallback.enabled == false then
+        print('^1[Murder of 8 Finale]^0 Finale interior missing and exterior fallback is disabled.')
+        DoScreenFadeIn(900)
+        sequenceRunning = false
+        return
+    end
+
+    if not isConfiguredCoord(coords) then
+        print('^1[Murder of 8 Finale]^0 Finale interior missing, but Config.FinaleFallback.coords is not configured. Player was NOT teleported.')
+        DoScreenFadeIn(900)
+        sequenceRunning = false
+        return
+    end
+
+    local ped = PlayerPedId()
+
+    teleportToFallback(coords)
+    RequestCollisionAtCoord(coords.x, coords.y, coords.z)
+    Wait(fallback.streamWaitMs or 900)
+
+    FreezeEntityPosition(ped, true)
+    DoScreenFadeIn(900)
+
+    Wait(650)
+
+    local chapter = M8Story
+        and M8Story.Chapters
+        and M8Story.Chapters[8]
+        or nil
+
+    local endingText = chapter
+        and chapter.completionText
+        or 'NOW YOU KNOW.\n\nTHAT MAKES YOU THE LAST WITNESS.'
+
+    showFinaleText(
+        'message',
+        endingText,
+        fallback.endingTextDurationMs or 3500
+    )
+
+    -- The fallback is only a presentation change. Save the same final evidence
+    -- so Chapter 8 progression remains identical to the apartment ending.
+    saveLastMessage()
+
+    Wait((fallback.endingTextDurationMs or 3500) + 500)
+
+    if not sequenceRunning then
+        FreezeEntityPosition(ped, false)
+        return
+    end
+
+    showCredits()
+
+    local creditEnd = GetGameTimer() + Finale.creditsDurationMs
+
+    while sequenceRunning and GetGameTimer() < creditEnd do
+        DisableAllControlActions(0)
+        Wait(0)
+    end
+
+    FreezeEntityPosition(ped, false)
+    sequenceRunning = false
 end
 
 local function beginFinalBellSequence()
@@ -581,6 +741,19 @@ local function beginFinalBellSequence()
 
         DoScreenFadeOut(Finale.fadeOutMs)
         waitForFadeOut(3000)
+
+        local hasInterior, interiorId = hasFinaleInterior()
+
+        if not hasInterior then
+            print('^3[Murder of 8 Finale]^0 Finale apartment interior not detected; using exterior fallback.')
+            runExteriorFallback()
+            return
+        end
+
+        print(
+            ('^2[Murder of 8 Finale]^0 Finale apartment interior detected: %s')
+                :format(tostring(interiorId))
+        )
 
         teleportToBed()
 

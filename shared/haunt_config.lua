@@ -24,7 +24,7 @@ Config.Hunt.sandyRadius = Config.Hunt.sandyRadius or 900.0
 
 -- "Actively investigating the clue" radius. Random scares and the dawn warning
 -- require the player to be near an unlocked/current Murder of 8 scene.
-Config.Hunt.activeSceneRadius = Config.Hunt.activeSceneRadius or 85.0
+Config.Hunt.activeSceneRadius = Config.Hunt.activeSceneRadius or 60.0 -- keep equal to Config.ScareDirector.sceneRadius
 
 Config.Haunting = Config.Haunting or {}
 Config.Haunting.enabled = Config.Haunting.enabled ~= false

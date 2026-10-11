@@ -288,6 +288,24 @@ local function triggerScare(scare, at)
     end
 end
 
+local function showChapterComplete(chapterIndex)
+    chapterIndex = tonumber(chapterIndex)
+    local chapter = chapterIndex and M8Story.Chapters[chapterIndex]
+    if not chapter then return end
+
+    SendNUIMessage({
+        action = 'chapterComplete',
+        chapter = chapterIndex,
+        text = chapter.completionText or '',
+        hint = chapter.nextHint or '',
+        place = chapter.placeHint or ''
+    })
+end
+
+RegisterNetEvent('m8:client:chapterComplete', function(chapterIndex)
+    showChapterComplete(chapterIndex)
+end)
+
 RegisterNetEvent('m8:client:evidenceResult', function(success, result, evidenceId, completedNow, chapterIndex)
     if not success then
         if result == 'already_found' then
@@ -330,15 +348,8 @@ RegisterNetEvent('m8:client:evidenceResult', function(success, result, evidenceI
     end
 
     if completedNow and chapterIndex and evidenceId ~= 'last_message' then
-        local chapter = M8Story.Chapters[chapterIndex]
         SetTimeout(900, function()
-            SendNUIMessage({
-                action = 'chapterComplete',
-                chapter = chapterIndex,
-                text = chapter and chapter.completionText or '',
-                hint = chapter and chapter.nextHint or '',
-                place = chapter and chapter.placeHint or ''
-            })
+            showChapterComplete(chapterIndex)
         end)
     end
 end)
@@ -445,6 +456,17 @@ CreateThread(function()
         Wait(1000)
     end
 end)
+
+RegisterCommand('m8complete', function(_, args)
+    local chapter = tonumber(args[1])
+
+    if not chapter or chapter < 1 or chapter > #M8Story.Chapters then
+        notify(('Usage: /m8complete 1-%d'):format(#M8Story.Chapters))
+        return
+    end
+
+    TriggerServerEvent('m8:server:completeChapter', math.floor(chapter))
+end, false)
 
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end

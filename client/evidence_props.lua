@@ -245,6 +245,18 @@ function M8_GetSpawnedEvidenceProp(key)
     return nil
 end
 
+-- Where a clue is examined: at its spawned physical prop when there is one (so the glow, the E prompt
+-- and the sounds sit on the object the player actually sees), otherwise at its scene point.
+function M8_GetEvidenceWorldCoords(evidenceId, sceneCoords)
+    local entity = M8_GetSpawnedEvidenceProp and M8_GetSpawnedEvidenceProp(evidenceId)
+
+    if entity and DoesEntityExist(entity) then
+        return GetEntityCoords(entity)
+    end
+
+    return sceneCoords
+end
+
 AddEventHandler('onResourceStop', function(resourceName)
     if resourceName ~= GetCurrentResourceName() then return end
     deleteAllProps()

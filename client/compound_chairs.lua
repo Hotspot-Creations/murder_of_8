@@ -130,6 +130,13 @@ local function playVossHelp()
         )
     end
 
+    -- 3D first: the call comes from the Voss ped himself through the Sandy Halloween bank (fades and pans
+    -- with the game's own audio). The panned NUI file below is only the fallback without that resource.
+    if M8NativeAudio and M8NativeAudio.Play and vossPed and DoesEntityExist(vossPed)
+        and M8NativeAudio.Play('voss_help', { entity = vossPed }) then
+        return true
+    end
+
     local volume = 0.18 + (progress * 0.82)
     local pan = getPanToWorldPoint(chairCoords)
 
@@ -286,11 +293,16 @@ end
 local function refreshNovaState(progress)
     progress = progress or (M8_GetProgress and M8_GetProgress() or nil)
 
-    novaFound =
-        progress
-        and progress.evidence
-        and progress.evidence.nova_body == true
-        or false
+    local found = progress and progress.evidence or {}
+
+    novaFound = found.nova_body == true
+
+    -- Once Voss himself has been documented the calls are over for good - including after a resource
+    -- restart, which used to forget that you had already reached him and start him calling again.
+    if found.voss == true or found.voss_confession == true then
+        vossReached = true
+        stopVossHelp()
+    end
 end
 
 local function applyRestrainedPose(ped)
@@ -442,6 +454,12 @@ RegisterNetEvent('m8:client:progress', function(progress)
 end)
 
 AddEventHandler('m8:client:evidenceFound', function(evidenceId)
+    if evidenceId == 'voss' or evidenceId == 'voss_confession' then
+        vossReached = true
+        stopVossHelp()
+        return
+    end
+
     if evidenceId ~= 'nova_body' then return end
 
     novaFound = true
