@@ -32,9 +32,9 @@ Config.ExteriorAccess = Config.ExteriorAccess or {
             coords = vector3(1762.927002, 3621.061035, 33.626545),
             label = 'Investigate the Hospital'
         },
-        maria = {
+        marina = {
             coords = vector3(1537.700317, 3771.182617, 33.050037),
-            label = 'Investigate the Maria'
+            label = 'Investigate the Marina'
         },
         university = {
             coords = vector3(1516.604492, 3698.793213, 34.211338),
